@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GalleryGaze</title>
+    <style>
+        /* General styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin-bottom: 80px; /* Ensure space for footer */
+        }
+
+        /* Header styles */
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
+            position: fixed;
+            width: 100%;
+            top: 45px;
+            z-index: 1000;
+        }
+
+        header .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        header input[type="text"] {
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            margin-right: 5px;
+        }
+
+        header button {
+            padding: 8px 16px;
+            font-size: 14px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Side menu styles */
+        #menuButton {
+            font-size: 18px;
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            text-align: left; /* Align text to the left within the button */
+            z-index: 999; /* Ensure above the side menu */
+        }
+
+        .side-menu {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            top: 50px;
+            left: 0;
+            background-color: #6a0dad;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 80px;
+            z-index: 999;
+        }
+
+        .side-menu .menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            color: white;
+        }
+
+        .side-menu ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .side-menu ul li {
+            padding: 10px 20px;
+        }
+
+        .side-menu ul li a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            transition: 3s;
+        }
+
+        .side-menu ul li a:hover {
+            background-color: #ffffff;
+            color: #333;
+        }
+
+        #closeButton {
+            font-size: 30px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+
+        /* Main content styles */
+        .content {
+            margin-top: 60px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .photo-container {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+            transition: 0.3s;
+        }
+
+        .photo-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .photo-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .photo-details {
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+
+        .photo-details p {
+            margin: 5px 0;
+        }
+
+        .download-button {
+            display: block;
+            width: fit-content;
+            padding: 6px 12px;
+            font-size: 12px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            border-radius: 3px;
+            margin-top: 5px;
+        }
+
+        .download-button:hover {
+            background-color: #45a049;
+        }
+
+        /* Footer styles */
+        footer {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+
+        #loadMoreButton {
+            padding: 8px 16px;
+            font-size: 14px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        /* Categories section styles */
+        .categories {
+            text-align: center;
+            padding: 10px 0;
+            background-color: #007bff;
+            margin-top: 80px;
+        }
+
+        .categories button {
+            margin: 5px;
+            padding: 8px 16px;
+            font-size: 14px;
+            background-color: #fff;
+            color: #007bff;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .categories button:hover {
+            background-color: #f0f0f0;
+        }
+
+        /* Scroll to bottom button styles */
+        #scrollBottomButton {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            font-size: 24px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        #scrollBottomButton:hover {
+            background-color: #0056b3;
+        }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <span class="logo">GalleryGaze</span>
+    <input type="text" id="searchQuery" placeholder="Search images...">
+    <button onclick="searchPhotos()">Search</button>
+    <button id="menuButton">☰ Menu</button>
+</header>
+
+<div class="side-menu" id="sideMenu">
+    <div class="menu-header">
+        <h2>Welcome to GalleryGaze</h2>
+        <button id="closeButton">&times;</button>
+    </div>
+    <nav>
+        <ul>
+            <li><a href="#">Home</a></li>
+           <li><a href="#">Privacy and Policy</a></li>
+       
+            <li><a href="#" onclick="sendEmail(event)">Support</a></li>
+        </ul>
+    </nav>
+</div>
+
+<div class="categories">
+    <button onclick="fetchCategory('nature')">Nature</button>
+    <button onclick="fetchCategory('architecture')">Architecture</button>
+    <button onclick="fetchCategory('technology')">Technology</button>
+    <button onclick="fetchCategory('food')">Food</button>
+    <button onclick="fetchCategory('people')">People</button>
+    <button onclick="fetchCategory('travel')">Travel</button>
+    <button onclick="fetchCategory('fashion')">Fashion</button>
+    <button onclick="fetchCategory('animal')">Animal</button>
+    <h6>*click or search to view images below</h6>
+</div>
+
+<section class="content" id="gallery">
+    <!-- Gallery content will be dynamically added here -->
+</section>
+
+<footer>
+    <p>&copy; 2024 GalleryGaze</p>
+    <button id="loadMoreButton" onclick="loadMorePhotos()">Load More</button>
+</footer>
+
+<!-- Scroll to bottom button -->
+  
+<button id="scrollBottomButton" onclick="scrollToBottom()"> ⬇ </button>
+  
+<script>
+    const API_KEY = 'IL1gSQtksDE69FFAzvjuitfoebAhjjKVpGI4E41HuvyLdkhMrwrzgoSe';
+    const API_URL = 'https://api.pexels.com/v1/search';
+    const RANDOM_API_URL = 'https://api.pexels.com/v1/curated?page=99&per_page=100';
+    let currentPage = 1;
+    const perPage = 100; // Adjust per page as needed
+    let totalPages = 5;
+    let currentCategory = '';
+
+    async function searchPhotos() {
+        const query = document.getElementById('searchQuery').value.trim();
+        if (query === '') return;
+
+        const url = `${API_URL}?query=${encodeURIComponent(query)}&per_page=${perPage}&page=1`;
+        fetchPhotos(url);
+    }
+
+    async function fetchCategory(category) {
+        currentCategory = category;
+        const url = `${API_URL}?query=${encodeURIComponent(category)}&per_page=${perPage}&page=1`;
+        fetchPhotos(url);
+    }
+
+    async function loadMorePhotos() {
+        if (currentPage >= totalPages) return;
+
+        currentPage++;
+        const query = currentCategory || document.getElementById('searchQuery').value.trim();
+        const url = `${API_URL}?query=${encodeURIComponent(query)}&per_page=${perPage}&page=${currentPage}`;
+        fetchPhotos(url);
+    }
+
+    async function fetchPhotos(url) {
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    Authorization: API_KEY
+                }
+            });
+            const data = await response.json();
+            displayPhotos(data.photos);
+            totalPages = Math.ceil(data.total_results / perPage);
+            updateLoadMoreButton();
+        } catch (error) {
+            console.error('Error fetching photos:', error);
+        }
+    }
+
+    function displayPhotos(photos) {
+        const gallery = document.getElementById('gallery');
+
+        photos.forEach(photo => {
+            const photoContainer = document.createElement('div');
+            photoContainer.className = 'photo-container';
+
+            const img = document.createElement('img');
+            img.src = photo.src.medium;
+            img.alt = photo.photographer;
+            img.classList.add('photo');
+
+            const details = document.createElement('div');
+            details.className = 'photo-details';
+            details.innerHTML = `
+                <p>Photo by <a href="${photo.photographer_url}" target="_blank">${photo.photographer}</a> on Pexels</p>
+                <a href="${photo.src.original}" download="${photo.photographer}-${photo.id}.jpg" class="download-button">Download</a>
+            `;
+
+            photoContainer.appendChild(img);
+            photoContainer.appendChild(details);
+            gallery.appendChild(photoContainer);
+        });
+    }
+
+    function updateLoadMoreButton() {
+        const loadMoreButton = document.getElementById('loadMoreButton');
+        loadMoreButton.style.display = currentPage >= totalPages ? 'none' : 'block';
+    }
+
+    document.getElementById("menuButton").onclick = function() {
+        document.getElementById("sideMenu").style.width = "250px"; /* Adjust width to match .open class */
+    };
+
+    document.getElementById("closeButton").onclick = function() {
+        document.getElementById("sideMenu").style.width = "0";
+    };
+
+    document.addEventListener('click', function(event) {
+        const sideMenu = document.getElementById("sideMenu");
+        const menuButton = document.getElementById("menuButton");
+
+        if (!sideMenu.contains(event.target) && !menuButton.contains(event.target)) {
+            sideMenu.style.width = "0";
+        }
+    });
+
+    function sendEmail(event) {
+        event.preventDefault(); // Prevent the default link behavior
+        
+        // Replace with your email address
+        var emailAddress = "shahid202218@gmail.com";
+
+        // Constructing the email link
+        var subject = "Reporting Issues on {mywebsite}";
+        var body = "Dear Support Team,\n\nI am writing to report several issues I have encountered while using {mywebsite}.\n\nPlease find the issues detailed below:\n\n1. Issue 1: Describe the first issue here.\n2. Issue 2: Describe the second issue here.\n3. Issue 3: Describe the third issue here.\n\nThank you for your attention to this matter. I look forward to your prompt response and resolution.\n\nBest regards,\n[Your Name]\n[Your Contact Information]\n[Optional: Your Account Username or ID]";
+
+        // Encode subject and body for URL
+        var subjectEncoded = encodeURIComponent(subject);
+        var bodyEncoded = encodeURIComponent(body);
+
+        // Constructing the mailto link
+        var mailtoLink = "mailto:" + emailAddress + "?subject=" + subjectEncoded + "&body=" + bodyEncoded;
+
+        // Opening the email client
+        window.location.href = mailtoLink;
+    }
+
+    function scrollToBottom() {
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: 'smooth'
+        });
+    }
+
+    // Function to fetch random images
+    async function fetchRandomPhotos() {
+        const url = `${RANDOM_API_URL}?per_page=${perPage}&page=1`;
+        fetchPhotos(url);
+    }
+
+    // Fetch random images on initial page load
+    window.onload = fetchRandomPhotos;
+
+</script>
+
+</body>
+</html>
